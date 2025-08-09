@@ -1,35 +1,63 @@
-Escáner de Red Automatizado con Nmap
-Este script de Python automatiza el proceso de reconocimiento en una red local utilizando Nmap. Su objetivo es descubrir hosts activos, identificar puertos abiertos y obtener información detallada sobre los servicios que se ejecutan en dichos puertos, guardando los resultados de forma organizada.
+# Escáner de Red Automatizado con Nmap y Capacidad de Reanudación
 
-Características Principales
-Descubrimiento de Hosts: Realiza un escaneo de ping (ping scan) para identificar de manera eficiente todos los dispositivos activos en un rango de red especificado (ej. 192.168.1.0/24).
+Este script de Python automatiza el proceso de reconocimiento en una red local utilizando Nmap. Su diseño modular en dos fases permite primero realizar un reconocimiento completo de la red para descubrir hosts y puertos abiertos, para luego ejecutar un análisis profundo sobre los objetivos identificados.
 
-Escaneo en Dos Etapas:
+La característica más importante es su capacidad de reanudar escaneos interrumpidos, guardando el progreso en archivos de estado para evitar la pérdida de tiempo y recursos.
 
-Identificación de Puertos: Escanea todos los 65,535 puertos TCP en cada host activo para encontrar únicamente los que están abiertos.
+## Características Principales
+Descubrimiento de Hosts: Realiza un escaneo de ping (ping scan) para identificar de manera eficiente todos los dispositivos activos en un rango de red especificado.
 
-Análisis de Servicios: Sobre los puertos abiertos detectados, ejecuta un escaneo profundo (-sCV) para determinar versiones de servicios y ejecutar scripts de reconocimiento básicos.
+## Escaneo en Dos Fases Globales:
 
-Reportes Individuales: Genera un archivo de texto (.txt) por cada host escaneado, conteniendo el informe detallado de sus puertos y servicios.
+Fase de Reconocimiento: Escanea todos los hosts activos para encontrar sus puertos TCP abiertos. El resultado de esta fase (IPs y sus puertos) se guarda en un archivo estado_fase1_puertos.json.
 
-Organización Automática: Crea automáticamente un directorio (resultados_escaneo) para almacenar todos los reportes generados.
+Fase de Análisis Profundo: Utilizando la información de la fase anterior, ejecuta un escaneo detallado (-sCV) sobre los puertos específicos de cada host para identificar servicios, versiones y ejecutar scripts de enumeración.
 
-Verificación de Dependencias: Comprueba si Nmap está instalado en el sistema antes de iniciar el escaneo para evitar errores.
+## Capacidad de Reanudación (Robustez):
+
+Fase 1: Si el script se detiene, al reiniciarlo leerá el archivo de estado y solo escaneará los hosts que quedaron pendientes. El progreso se guarda después de analizar cada IP.
+
+Fase 2: Antes de analizar un host, el script verifica si ya existe un reporte final (.txt). Si es así, lo omite y pasa al siguiente, permitiendo reanudar la fase de análisis si fue interrumpida.
+
+## Reportes Individuales y Organizados:
+
+Crea automáticamente un directorio (resultados_escaneo).
+
+Genera un archivo de texto (.txt) por cada host, conteniendo el informe detallado de sus servicios.
+
+## Verificación de Dependencias: Comprueba si Nmap está instalado en el sistema antes de iniciar cualquier escaneo.
 
 Requisitos
 Python 3.x
 
-Nmap: Debe estar instalado y accesible desde el PATH del sistema. Puedes descargarlo desde nmap.org.
+### Nmap: Debe estar instalado y accesible desde el PATH del sistema. Puedes descargarlo desde nmap.org.
 
-¿Cómo Usarlo?
-Clona o descarga el repositorio.
+# ¿Cómo Usarlo?
+Clona o descarga el script en un directorio.
 
 Asegúrate de tener Nmap instalado en tu sistema.
 
-(Opcional) Modifica las variables red_a_escanear y directorio_resultados dentro del script para ajustarlas a tus necesidades.
+(Opcional) Modifica la variable red_a_escanear dentro del script para ajustarla a tu red.
 
 Abre una terminal en el directorio del proyecto y ejecuta el script:
 
-python scan_network.py
+```
+python ultimate_nmap_txt.py
+```
 
-Una vez finalizado, los resultados se encontrarán en la carpeta resultados_escaneo.
+El script comenzará a trabajar. Puedes interrumpirlo de forma segura (Ctrl+C) y volver a ejecutar el mismo comando para que continúe desde donde se quedó.
+
+Estructura de Archivos de Salida
+Todos los archivos se generan dentro de la carpeta resultados_escaneo/:
+
+estado_fase1_puertos.json:
+
+### Propósito: Almacena el progreso de la Fase 1. Es un archivo JSON que contiene un diccionario con las IPs descubiertas como claves y una lista de sus puertos abiertos como valores.
+
+Uso: Permite que el script sepa qué hosts ya fueron analizados en la Fase 1 para no repetir el trabajo.
+
+resultado_192_168_1_X.txt:
+
+### Propósito: Contiene el reporte final y detallado de la Fase 2 para una IP específica.
+
+Uso: Es el resultado final del análisis de servicios para cada objetivo. El script usa la existencia de este archivo para saber si debe omitir el escaneo de Fase 2 para esa IP.
