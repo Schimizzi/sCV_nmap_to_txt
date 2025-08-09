@@ -1,0 +1,35 @@
+Escáner de Red Automatizado con Nmap
+Este script de Python automatiza el proceso de reconocimiento en una red local utilizando Nmap. Su objetivo es descubrir hosts activos, identificar puertos abiertos y obtener información detallada sobre los servicios que se ejecutan en dichos puertos, guardando los resultados de forma organizada.
+
+Características Principales
+Descubrimiento de Hosts: Realiza un escaneo de ping (ping scan) para identificar de manera eficiente todos los dispositivos activos en un rango de red especificado (ej. 192.168.1.0/24).
+
+Escaneo en Dos Etapas:
+
+Identificación de Puertos: Escanea todos los 65,535 puertos TCP en cada host activo para encontrar únicamente los que están abiertos.
+
+Análisis de Servicios: Sobre los puertos abiertos detectados, ejecuta un escaneo profundo (-sCV) para determinar versiones de servicios y ejecutar scripts de reconocimiento básicos.
+
+Reportes Individuales: Genera un archivo de texto (.txt) por cada host escaneado, conteniendo el informe detallado de sus puertos y servicios.
+
+Organización Automática: Crea automáticamente un directorio (resultados_escaneo) para almacenar todos los reportes generados.
+
+Verificación de Dependencias: Comprueba si Nmap está instalado en el sistema antes de iniciar el escaneo para evitar errores.
+
+Requisitos
+Python 3.x
+
+Nmap: Debe estar instalado y accesible desde el PATH del sistema. Puedes descargarlo desde nmap.org.
+
+¿Cómo Usarlo?
+Clona o descarga el repositorio.
+
+Asegúrate de tener Nmap instalado en tu sistema.
+
+(Opcional) Modifica las variables red_a_escanear y directorio_resultados dentro del script para ajustarlas a tus necesidades.
+
+Abre una terminal en el directorio del proyecto y ejecuta el script:
+
+python scan_network.py
+
+Una vez finalizado, los resultados se encontrarán en la carpeta resultados_escaneo.
